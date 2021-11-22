@@ -33,8 +33,25 @@ def process(url, listUrlNovel, listUrlChapter):
         linkNovel = linkChapter
         uriNovel = linkNovel.replace('https://www.novelpub.com/novel/', '')
         uriNovels = uriNovel.split("/")
-        novelId = uriNovels[0]
+        novelIdRaw = uriNovels[0]
+        print('novelIdRaw: ' + novelIdRaw)
         chapterId = uriNovels[1]
+        # -----------------------------------------------------------------------------------------
+        novelName = novel.find_element_by_class_name('item-body').find_element_by_tag_name('h4').text
+        novelId = novelIdRaw
+        if '(' in novelName:
+            indexChar = novelName.rfind('(')
+            novelNameTmp = novelName[:indexChar].strip()
+            print('novelNameTmp: ' + novelNameTmp)
+            novelNameTmp = novelNameTmp.replace('~', '').replace('`', '').replace('!', '') \
+                .replace('\'', '').replace('@', '').replace('#', '').replace('$', '').replace('%', '') \
+                .replace('^', '').replace('&', '').replace('*', '').replace('(', '').replace(')', '') \
+                .replace('_', '').replace('=', '').replace('+', '').replace('.', '').replace(',', '') \
+                .replace(':', '').replace(';', '') \
+                .lower()
+            novelId = novelNameTmp.replace(' ', '-')
+        print('novelId: ' + novelId)
+        print('------------------------------------------------------------------------------')
         # -----------------------------------------------------------------------------------------
         objRequest = api_common.RequestApi(novelId, '', 0, 0)
         # convert to JSON string
@@ -49,11 +66,11 @@ def process(url, listUrlNovel, listUrlChapter):
             id = objData['id']
             if not id:
                 print(novelId)
-                listUrlNovel.append('https://www.novelpub.com/novel/' + str(novelId))
+                listUrlNovel.append('https://www.novelpub.com/novel/' + novelIdRaw)
             else:
-                listUrlChapter.append('https://www.novelpub.com/novel/' + str(novelId))
+                listUrlChapter.append('https://www.novelpub.com/novel/' + novelIdRaw + '/' + chapterId)
         except:
-            listUrlNovel.append('https://www.novelpub.com/novel/' + str(novelId))
+            listUrlNovel.append('https://www.novelpub.com/novel/' + novelIdRaw)
 
         # for key, value in resonse_json.items():
         #     data = value
